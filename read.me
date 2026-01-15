@@ -1,0 +1,133 @@
+# Multimodal Stock Movement Classification  
+**Time Series + Text-Based Fusion Approaches**
+
+Bu projede, finansal zaman serisi verileri (fiyatlar ve teknik göstergeler) ile yatırımcı yorumlarından oluşan metin verileri birlikte kullanılarak, hisse senedi fiyat hareketlerinin **UP / DOWN / FLAT** sınıfları altında tahmin edilmesi amaçlanmıştır.  
+
+Çalışma, tekil modaliteye dayalı modellerin yanı sıra **Early, Intermediate ve Late Fusion** stratejilerini karşılaştırmalı olarak değerlendiren çok modlu bir sınıflandırma sistemi sunmaktadır.
+
+---
+
+## 📌 Problem Tanımı
+
+Amaç, bir sonraki işlem günü için hisse senedi fiyat yönünü aşağıdaki üç sınıf altında tahmin etmektir:
+
+- **UP**   : Yukarı yönlü hareket  
+- **DOWN** : Aşağı yönlü hareket  
+- **FLAT** : Yatay hareket  
+
+Problem, dengesiz ve gürültülü finansal veri yapısı nedeniyle **zor bir çok sınıflı sınıflandırma problemi** olarak ele alınmıştır.
+
+---
+
+## 📊 Kullanılan Veri Setleri
+
+### 1️⃣ Zaman Serisi Verisi
+- Günlük fiyat verileri (open, high, low, close, volume)
+- Teknik göstergeler:
+  - SMA (20, 50)
+  - EMA (20)
+  - RSI (14)
+  - MACD, MACD Signal
+- Kaydırmalı pencere (sliding window) yaklaşımı  
+  - **Window size:** 20 gün
+
+### 2️⃣ Metin Verisi
+- Yatırımcı yorumları (günlük bazda birleştirilmiş)
+- Ön işleme:
+  - Tarih eşleştirme
+  - Boş günlerin yönetimi
+  - Tokenizasyon ve truncation
+
+---
+
+## 🧠 Kullanılan Modeller
+
+### 🔹 Metin Modalitesi
+| Model | Tür |
+|------|----|
+| BiLSTM | Derin Öğrenme |
+| DistilBERT | Transformer |
+| BERT | Transformer |
+
+### 🔹 Zaman Serisi Modalitesi
+| Model | Tür |
+|------|----|
+| LSTM | Derin Öğrenme |
+| Transformer (Mean Pooling) | Transformer |
+| Transformer (Attention Pooling) | Transformer |
+
+Tüm modeller **5-Fold Stratified Cross-Validation** ile eğitilmiş ve değerlendirilmiştir.
+
+---
+
+## 🔗 Fusion Yaklaşımları
+
+### 1️⃣ Early Fusion (Concat + MLP)
+- Metin ve zaman serisi embedding’leri birleştirilir
+- Tek bir MLP ile sınıflandırma yapılır
+
+### 2️⃣ Intermediate Fusion (Embedding + MLP / Cross-Modal)
+- Modaliteler arası temsil düzeyinde etkileşim
+- Duyarlı ancak hiperparametrelere hassas yapı
+
+### 3️⃣ Late Fusion
+- Modeller ayrı ayrı tahmin üretir
+- Birleştirme yöntemleri:
+  - Majority Voting
+  - Soft Voting
+  - Weighted Soft Voting
+  - Stacking (opsiyonel)
+
+---
+
+## 📈 Değerlendirme Metrikleri
+
+- **Accuracy**
+- **Macro-F1** (sınıf dengesizliği nedeniyle ana metrik)
+
+Early stopping ve fold bazlı değerlendirme protokolü uygulanmıştır.
+
+---
+
+## 🔍 Hatalı Sınıflandırma Analizi (Özet)
+
+- **FLAT sınıfı**, tüm modellerde en zor tahmin edilen sınıftır.
+- Zaman serisi modelleri, ani ve kısa vadeli dalgalanmalarda hata yapmaya eğilimlidir.
+- Metin modelleri, çelişkili veya belirsiz yorumlarda zorlanmaktadır.
+- Late fusion yaklaşımları, tekil modellere kıyasla daha kararlı sonuçlar üretmiştir.
+
+---
+
+## 🏁 Sonuçlar
+
+- Zaman serisi modelleri genel olarak daha baskın performans göstermiştir.
+- Metin verisi tek başına sınırlı olsa da fusion aşamasında katkı sağlamıştır.
+- **Late Fusion**, en dengeli ve istikrarlı sonuçları üretmiştir.
+- Çok modlu yaklaşımın finansal sınıflandırma problemlerinde uygulanabilir olduğu gösterilmiştir.
+
+---
+
+## ⚙️ Kullanılan Teknolojiler
+
+- Python
+- PyTorch
+- HuggingFace Transformers
+- Scikit-learn
+- Pandas / NumPy
+- Google Colab (A100 GPU)
+
+---
+
+## 🚀 Gelecek Çalışmalar
+
+- Daha uzun zaman pencereleri
+- Alternatif teknik göstergeler
+- Daha dengeli sınıf tanımları
+- Gelişmiş fusion mimarileri (attention-based)
+
+---
+
+## 👤 Yazar
+
+Bu proje akademik bir çalışma kapsamında geliştirilmiştir.  
+Detaylar ve deneysel sonuçlar için rapor dosyasına bakınız.
